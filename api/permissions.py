@@ -19,3 +19,10 @@ class IsSellerOwnerOrReadOnly(permissions.BasePermission):
             
         # ถ้า POST / PUT / PATCH / DELETE สินค้านั้น ชื่อผู้ขายในสินค้า ต้องตรงกับคนที่ล็อกอินอยู่เท่านั้น
         return obj.seller == request.user
+
+class IsBuyer(permissions.BasePermission):
+    def has_permission(self, request, view):
+        # ต้อง Login และต้องมี Role BUYER
+        is_authenticated = bool(request.user and request.user.is_authenticated)
+        is_buyer = hasattr(request.user, 'profile') and request.user.profile.role == 'BUYER'
+        return is_authenticated and is_buyer

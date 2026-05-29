@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product, Profile
+from .models import Product, Profile, Cart, CartItem
 from django.contrib.auth.models import User
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -42,3 +42,26 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
+
+class CartItemSerializer(serializers.ModelSerializer):
+    product_title = serializers.CharField(source='product.title', read_only=True)
+    unit_price = serializers.DecimalField(source='product.unit_price', max_digits=10, decimal_places=2, read_only=True)
+    subtotal = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CartItem
+        fields = ['id', 'product', 'product_title', 'unit_price', 'quantity', 'subtotal']
+
+    def get_subtotal(self, obj):
+        return obj.quantity * obj.product.unit_price
+
+class CartSerializer(serializers.ModelSerializer):
+    items = CartItemSerializer(many=True, read_only=True)
+    total_price = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Cart
+        fields = ['id', 'buyer', 'items', 'total_price']
+
+    def get_total_price(self, obj):
+        return sum(item.quantity * item.product.unit_price for item in obj.items.all())
