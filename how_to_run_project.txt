@@ -17,3 +17,29 @@ python manage.py migrate // สั่งสร้างตาราง
 python manage.py createsuperuser // สร้าง admin ไว้ login ทดสอบระบบ ในส่วน email ไม่ต้องใส่ก็ได้ข้ามไปเลย
 python manage.py runserver // สั่งรัน api backend
 
+
+// ระบบ register
+pip install djangorestframework-simplejwt
+
+http://localhost:8000/api/register/
+{
+    "username": "tonkung",
+    "password": "1234",
+    "email": "tonkung@gmail.com",
+    "role": "SELLER"
+}
+
+http://localhost:8000/api/auth/login/?next=/api/register/
+{
+    "username": "tonkung",
+    "password": "1234"
+}
+
+http://localhost:8000/api/products/
+
+{
+    "title": "คีย์บอร์ด Mechanical",
+    "description": "สวิตช์สีฟ้า มีไฟ RGB",
+    "unit_price": "2590.00",
+    "available_quantity": 15
+}
