@@ -1,0 +1,3 @@
+// How to use venv for developer
+
+venv\Scripts\activate
