@@ -2,8 +2,10 @@
 // Virtual Environment
 venv\Scripts\activate // ป้องกันปัญหา "เวอร์ชันตีกัน" (Dependency Hell)
 
-python manage.py runserver
+pip install python-dotenv
+pip freeze > requirements.txt
 
+python manage.py runserver
 
 // How to step create database postgreSQL
 docker-compose.yml
@@ -62,3 +64,7 @@ POST http://localhost:8000/api/cart/
 
 // ชำระเงิน
 POST http://localhost:8000/api/cart/payment/
+
+
+// Unit test
+python manage.py test api
