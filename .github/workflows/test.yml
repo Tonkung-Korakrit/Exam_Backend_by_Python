@@ -1,0 +1,56 @@
+name: Django Unit Tests CI
+
+# สั่งให้ทำงานทุกครั้งที่มีการ Push โค้ดเข้า branch main (หรือ master)
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_DB: ecom_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: 1234
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    # ติดตั้ง Python
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10' # ปรับเป็นเวอร์ชันที่คุณใช้อยู่ได้ครับ
+
+    # ติดตั้ง Library จาก requirements.txt
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    # รัน Unit Test
+    - name: Run Django Tests
+      env:
+        SECRET_KEY: 'dummy-secret-key-for-github-actions'
+        DEBUG: 'True'
+        POSTGRES_DB: ecom_db
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: 1234
+        POSTGRES_HOST: localhost
+        POSTGRES_PORT: 5433
+      run: |
+        python manage.py test api

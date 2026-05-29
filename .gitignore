@@ -16,7 +16,7 @@ staticfiles/
 
 # 4. Secrets & Credentials
 .env
-!env.example
+!.env.example
 .env.local
 .env.*
 

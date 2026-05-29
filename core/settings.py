@@ -14,22 +14,26 @@ from pathlib import Path
 
 import os
 from datetime import timedelta
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# อ่านไฟล์ .env
+load_dotenv(os.path.join(BASE_DIR, '.env'))
+SECRET_KEY = os.getenv('SECRET_KEY')
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-$hwy73j*%j!!^outffd6ukvhrspn8tjv!r@n0&sm5seoqathe6'
+# SECRET_KEY = 'django-insecure-$hwy73j*%j!!^outffd6ukvhrspn8tjv!r@n0&sm5seoqathe6'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -90,11 +94,11 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ecom_db',         # ต้องตรงกับ POSTGRES_DB
-        'USER': 'postgres',        # ต้องตรงกับ POSTGRES_USER
-        'PASSWORD': '1234',    # ต้องตรงกับ POSTGRES_PASSWORD
-        'HOST': '127.0.0.1',
-        'PORT': '5433',
+        'NAME': os.getenv('POSTGRES_DB', 'ecom_db'),         
+        'USER': os.getenv('POSTGRES_USER', 'postgres'),        
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', '1234'),    
+        'HOST': os.getenv('POSTGRES_HOST', '127.0.0.1'),
+        'PORT': os.getenv('POSTGRES_PORT', '5433'),
     }
 }
 
