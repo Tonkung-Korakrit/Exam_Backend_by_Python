@@ -1,0 +1,26 @@
+# 1. Python & Django Caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.sqlite3
+db.sqlite3
+
+# 2. Virtual Environment
+venv/
+env/
+ENV/
+
+# 3. Media & Static Files
+images/
+staticfiles/
+
+# 4. Secrets & Credentials
+.env
+!env.example
+.env.local
+.env.*
+
+.vscode/
+Thumbs.db
+Desktop.ini
+.DS_Store

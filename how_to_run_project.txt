@@ -1,0 +1,64 @@
+// How to use venv for developer
+// Virtual Environment
+venv\Scripts\activate // ป้องกันปัญหา "เวอร์ชันตีกัน" (Dependency Hell)
+
+python manage.py runserver
+
+
+// How to step create database postgreSQL
+docker-compose.yml
+docker-compose up -d // docker-compose down (-v)
+
+// โครงสร้าง db
+python -m pip install Pillow // library ที่ทำให้สามารถอ่าน หรือตรวจสอบไฟล์รูปภาพด้วยได้
+python manage.py makemigrations // ให้เข้าไปอ่าน models.py
+python manage.py migrate // สั่งสร้างตาราง
+python manage.py createsuperuser // สร้าง admin ไว้ login ทดสอบระบบ ในส่วน email ไม่ต้องใส่ก็ได้ข้ามไปเลย
+python manage.py runserver // สั่งรัน api backend
+
+
+// ระบบ register
+pip install djangorestframework-simplejwt
+
+POST http://localhost:8000/api/register/
+{
+    "username": "tonkung",
+    "password": "1234",
+    "email": "tonkung@gmail.com",
+    "role": "SELLER"
+}
+
+POST http://localhost:8000/api/auth/login/?next=/api/register/
+{
+    "username": "tonkung",
+    "password": "1234"
+}
+
+POST http://localhost:8000/api/products/
+
+{
+    "title": "คีย์บอร์ด Mechanical",
+    "description": "สวิตช์สีฟ้า มีไฟ RGB",
+    "unit_price": "2590.00",
+    "available_quantity": 15
+}
+
+// search & filter
+GET http://localhost:8000/api/products/?search=tonkung
+GET http://localhost:8000/api/products/?search=YONEX
+GET http://localhost:8000/api/products/?min_price=1000&max_price=3000
+GET http://localhost:8000/api/products/?ordering=unit_price // เรียงจากถูกไปแพง
+GET http://localhost:8000/api/products/?ordering=-unit_price // เรียงจากแพงไปถูก
+
+// search & filter หลายเงื่อนไข
+GET http://localhost:8000/api/products/?search=ไม้แบด&max_price=2000&ordering=unit_price
+
+// เพิ่มของลงตะกร้า
+POST http://localhost:8000/api/cart/
+{
+    "product_id": 1,
+    "quantity": 2
+}
+
+// ชำระเงิน
+POST http://localhost:8000/api/cart/payment/
