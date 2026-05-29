@@ -32,3 +32,13 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = ['id', 'seller', 'seller_name', 'title', 'description', 'image', 'unit_price', 'available_quantity', 'created_at']
         # ป้องกันไม่ให้คนอื่นมาแก้ ID คนขายได้
         read_only_fields = ['seller']
+
+class ProductListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'title', 'image', 'unit_price', 'available_quantity']
+
+class ProductDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = '__all__'

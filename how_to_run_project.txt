@@ -43,3 +43,11 @@ http://localhost:8000/api/products/
     "unit_price": "2590.00",
     "available_quantity": 15
 }
+
+GET /api/products/?search=tonkung
+http://localhost:8000/api/products/?search=YONEX
+GET /api/products/?min_price=1000&max_price=3000
+GET /api/products/?ordering=unit_price // เรียงจากถูกไปแพง
+GET /api/products/?ordering=-unit_price // เรียงจากแพงไปถูก
+
+GET /api/products/?search=ไม้แบด&max_price=2000&ordering=unit_price
