@@ -13,7 +13,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:13
+        image: postgres:14
         env:
           POSTGRES_DB: ecom_db
           POSTGRES_USER: postgres
