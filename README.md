@@ -99,22 +99,16 @@ python manage.py runserver
 
 | Method | Endpoint | Description | Payload |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/api/register/` | Register a new user | `username`, `password`, `email`, `role` ("SELLER" or "BUYER") |
-| `POST` | `/api/auth/login/` | Login and get JWT Token | `username`, `password` |
-
-## API Endpoints Reference
-
-| Method | Endpoint | Description | Payload / Query Parameters |
-| :--- | :--- | :--- | :--- |
 | `POST` | `/api/register/` | Register a new user | `username, password, email, role ("SELLER" or "BUYER")` | Create a product (Seller only) | `title, description, unit_price, available_quantity`
 | `POST` | `/api/auth/login/` | Login and get JWT Token | `username, password` |
+
+# API Endpoints Reference
 
 ## Products (Catalog & Management)
 
 | Method | Endpoint | Description | Payload / Query Parameters |
 | :--- | :--- | :--- | :--- |
 | `GET` | `/api/products/` | List all products | `Supports search & filters`
-| `POST` | `/api/auth/login/` | Login and get JWT Token | `username, password` |
 | `POST` | `/api/products/` | List all products | `Supports search & filters`
 | `POST` | `/api/auth/login/` | Create a product (Seller only) | `title, description, unit_price, available_quantity` |
 
