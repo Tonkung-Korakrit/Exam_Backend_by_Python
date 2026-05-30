@@ -28,6 +28,7 @@ POSTGRES_USER=postgres
 POSTGRES_PASSWORD=your_password
 POSTGRES_HOST=127.0.0.1
 POSTGRES_PORT=5433
+```
 
 ---
 
@@ -52,9 +53,13 @@ python -m venv venv
 ```
 
 ### On Windows:
+```bash
 venv\Scripts\activate
+```
 ### On Mac/Linux:
-### source venv/bin/activate
+```bash
+source venv/bin/activate
+```
 
 Install the required dependencies:
 
