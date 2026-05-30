@@ -16,9 +16,9 @@ staticfiles/
 
 # 4. Secrets & Credentials
 .env
-!.env.example
-.env.local
 .env.*
+
+!.env.example
 
 .vscode/
 Thumbs.db
