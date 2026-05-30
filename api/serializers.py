@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product, Profile, Cart, CartItem
+from .models import Product, Profile, Cart, CartItem, OrderItem, Order
 from django.contrib.auth.models import User
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -24,6 +24,22 @@ class RegisterSerializer(serializers.ModelSerializer):
         
         return user
 
+# ------------
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ['role'] # ถ้าในอนาคตมีเบอร์โทรหรือที่อยู่ ก็มาเพิ่มตรงนี้ได้ครับ
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'profile']
+
+# ------------
+
 class ProductSerializer(serializers.ModelSerializer):
     seller_name = serializers.CharField(source='seller.username', read_only=True)
 
@@ -45,14 +61,23 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         
         read_only_fields = ['seller']
 
+# ------------
+
+class ProductSimpleSerializer(serializers.ModelSerializer):
+    """ใช้สำหรับดึงข้อมูลรายละเอียดสินค้ามาแสดงในตะกร้า"""
+    class Meta:
+        model = Product
+        fields = ['id', 'title', 'unit_price', 'image']
+
 class CartItemSerializer(serializers.ModelSerializer):
-    product_title = serializers.CharField(source='product.title', read_only=True)
-    unit_price = serializers.DecimalField(source='product.unit_price', max_digits=10, decimal_places=2, read_only=True)
+    # ฟิลด์เสริมที่สร้างเอง
+    product_detail = ProductSimpleSerializer(source='product', read_only=True)
     subtotal = serializers.SerializerMethodField()
 
     class Meta:
         model = CartItem
-        fields = ['id', 'product', 'product_title', 'unit_price', 'quantity', 'subtotal']
+        # ต้องใส่ชื่อฟิลด์ให้ครบตามที่ประกาศไว้ด้านบน!
+        fields = ['id', 'product', 'product_detail', 'quantity', 'subtotal']
 
     def get_subtotal(self, obj):
         return obj.quantity * obj.product.unit_price
@@ -67,3 +92,18 @@ class CartSerializer(serializers.ModelSerializer):
 
     def get_total_price(self, obj):
         return sum(item.quantity * item.product.unit_price for item in obj.items.all())
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    product_title = serializers.CharField(source='product.title', read_only=True)
+
+    class Meta:
+        model = OrderItem
+        fields = ['product_title', 'quantity', 'price_at_purchase']
+
+class OrderSerializer(serializers.ModelSerializer):
+    # ดึงรายละเอียดสินค้าในบิลนั้นๆ ออกมาทั้งหมด
+    items = OrderItemSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Order
+        fields = ['id', 'total_price', 'status', 'created_at', 'items']

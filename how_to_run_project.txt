@@ -18,6 +18,7 @@ python manage.py migrate // สั่งสร้างตาราง
 python manage.py createsuperuser // สร้าง admin ไว้ login ทดสอบระบบ ในส่วน email ไม่ต้องใส่ก็ได้ข้ามไปเลย
 python manage.py runserver // สั่งรัน api backend
 
+pip install django-cors-headers
 
 // ระบบ register
 pip install djangorestframework-simplejwt
@@ -40,9 +41,23 @@ POST http://localhost:8000/api/products/
 
 {
     "title": "คีย์บอร์ด Mechanical",
-    "description": "สวิตช์สีฟ้า มีไฟ RGB",
-    "unit_price": "2590.00",
+    "description": "สวิตช์สีมินิมอล (น้ำตาล, ครีม, ฟ้า) มีไฟ RGB",
+    "unit_price": 5555.00,
+    "available_quantity": 3
+}
+
+{
+    "title": "ไม้แบดมินตัน Astrox",
+    "description": "รุ่น 100ZZ น้ำหนักไม้ (U): 4U",
+    "unit_price": 11111.00,
     "available_quantity": 15
+}
+
+{
+    "title": "รองเท้าแบดมินตัน VICTOR",
+    "description": "รุ่น A970TD",
+    "unit_price": 2890.00,
+    "available_quantity": 5
 }
 
 // search & filter
@@ -65,6 +80,8 @@ POST http://localhost:8000/api/cart/
 // ชำระเงิน
 POST http://localhost:8000/api/cart/payment/
 
+// ประวัติการซื้อสินค้า
+GET http://localhost:8000/api/orders/history/
 
 // Unit test
 python manage.py test api
