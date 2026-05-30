@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 
 from rest_framework import viewsets, permissions, generics, status
 from .models import Product, Cart, CartItem, Product, Order, OrderItem
-from .serializers import RegisterSerializer, ProductSerializer, ProductListSerializer, ProductDetailSerializer, CartSerializer
+from .serializers import RegisterSerializer, ProductSerializer, UserProfileSerializer, ProductListSerializer, ProductDetailSerializer, CartSerializer, OrderSerializer
 from rest_framework.permissions import AllowAny
 from django.contrib.auth.models import User
 from .permissions import IsSellerOwnerOrReadOnly, IsBuyer
@@ -14,11 +14,26 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db import transaction # สำคัญมาก ตอน Checkout
 
+from rest_framework.permissions import IsAuthenticated
+
 # Create your views here.
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = [AllowAny]
     serializer_class = RegisterSerializer
+
+class UserProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # request.user จะเก็บข้อมูลของคนที่ล็อกอินอยู่โดยอัตโนมัติ (อ่านจาก Token)
+        user = request.user
+        
+        # เอา user ไปแปลงเป็น JSON ผ่าน Serializer
+        serializer = UserProfileSerializer(user)
+        
+        # ส่งข้อมูลกลับไป
+        return Response(serializer.data)
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
@@ -42,6 +57,14 @@ class ProductViewSet(viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         serializer.save(seller=self.request.user)
+
+class MyProductListView(generics.ListAPIView):
+    serializer_class = ProductSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # ดึงมาเฉพาะสินค้าที่ฟิลด์ seller ตรงกับคนที่กำลังล็อกอิน (request.user)
+        return Product.objects.filter(seller=self.request.user)
 
 # สำหรับจัดการตะกร้า
 class CartView(APIView):
@@ -77,6 +100,31 @@ class CartView(APIView):
 
         cart_item.save()
         return Response({"message": "เพิ่มสินค้าลงตะกร้าเรียบร้อย"}, status=status.HTTP_200_OK)
+
+    def delete(self, request):
+        # 1. ดึงตะกร้าของ user คนนี้
+        cart, created = Cart.objects.get_or_create(buyer=request.user)
+        
+        # 2. รับ product_id ที่ต้องการลบจาก request
+        product_id = request.data.get('product_id')
+        
+        # 3. ค้นหาสินค้าในตะกร้า
+        cart_item = CartItem.objects.filter(cart=cart, product_id=product_id).first()
+        
+        if not cart_item:
+            return Response({"error": "ไม่พบสินค้าชิ้นนี้ในตะกร้า"}, status=status.HTTP_404_NOT_FOUND)
+        
+        # 4. ลบสินค้าชิ้นนั้นออกจากตะกร้า
+        cart_item.delete()
+        
+        return Response({"message": "ลบสินค้าออกจากตะกร้าเรียบร้อยแล้ว"}, status=status.HTTP_200_OK)
+
+class CartItemDetailView(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        # ล็อกไว้ว่าต้องลบได้เฉพาะของตัวเองเท่านั้น
+        return CartItem.objects.filter(cart__buyer=self.request.user)
 
 # กดจ่ายเงิน และตัดสต็อก
 class PaymentView(APIView):
@@ -123,3 +171,11 @@ class PaymentView(APIView):
             "order_id": order.id,
             "total_price": total_price
         }, status=status.HTTP_201_CREATED)
+    
+class OrderHistoryListView(generics.ListAPIView):
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # ดึงเฉพาะรายการสั่งซื้อของคนที่ล็อกอิน และเรียงจากล่าสุดไปเก่าสุด
+        return Order.objects.filter(buyer=self.request.user).order_by('-created_at')
